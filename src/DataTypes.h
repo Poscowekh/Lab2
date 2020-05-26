@@ -1,6 +1,9 @@
 #ifndef DATATYPES_H
+#pragma once
 #define DATATYPES_H
 #include <iostream>
+#include <utility>
+#include <string>
 
 //No log
 
@@ -17,18 +20,33 @@ class Complex
             real = 0;
             imaginary = 0;
         };
-        Complex(TypeReal re, TypeIm im){
+        Complex(TypeReal re, TypeIm im)
+        {
             real = re;
             imaginary = im;
         };
+        Complex(pair<TypeReal, TypeIm> pair)
+        {
+            real = pair.first;
+            imaginary = pair.second;
+        };
+        string StringComplex()
+        {
+            string result = to_string(real) + '+' + to_string(imaginary) + 'i';
+            return result;
+        };
         void PrintComplex(){
-            cout << real << " + " << imaginary << 'i' << endl;
+            cout << StringComplex() << endl;
         };
         TypeReal GetReal(){
             return real;
         };
         TypeIm GetImaginary(){
             return imaginary;
+        };
+        pair<TypeReal, TypeIm> GetPair()
+        {
+            return make_pair(real, imaginary);
         };
         Complex<TypeReal, TypeIm> GetConjugate()
         {

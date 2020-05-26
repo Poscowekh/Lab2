@@ -1,7 +1,9 @@
+#pragma once
 #ifndef DYNAMICARRAY_H
 #define DYNAMICARRAY_H
 #include <mem.h>
 #include <stdlib.h>
+#include <cassert>
 
 using namespace std;
 
@@ -11,6 +13,7 @@ class DynamicArray
     private:
         int size;
         int element_size;
+        int capacity;
         DataType* data;
         void Allocate(int new_size)
         {
@@ -40,12 +43,18 @@ class DynamicArray
             element_size = sizeof(DataType);
             Allocate(new_size);
         };
-        DynamicArray(DynamicArray<DataType>* array)
+        DynamicArray(DataType* new_data, int count)
         {
-            element_size = array->GetElementSize();
-            Reallocate(array->GetSize());
-            memcpy(data, array->GetPointer(0), element_size * size);
-        }
+            data = new_data;
+            size = count;
+            element_size = sizeof(DataType);
+        };
+        DynamicArray(const DynamicArray<DataType> &array)
+        {
+            data = array.data;
+            size = array.size;
+            element_size = array.element_size;
+        };
         int GetSize()
         {
             return size;
@@ -64,11 +73,15 @@ class DynamicArray
         };
         DataType Get(int index)
         {
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
             DataType* tmp = data + index;
             return *tmp;
         };
         DataType* GetPointer(int index)
         {
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
             DataType* tmp = data + index;
             return tmp;
         };
@@ -80,19 +93,30 @@ class DynamicArray
         {
             return GetPointer(size - 1);
         };
-        void CopyArray(DataType* new_data, int from, int count)
+        void CopyToArray(DataType* new_data, int from, int count)
         {
+            assert(from < 0 && "IndexOutOfRange");
+            assert(count < 0 && "IndexOutOfRange");
+            assert(from > count && "IndexOutOfRange");
             Reallocate(count - from + 1);
             for(int i = 0; i < size; i++)
                 memcpy(data + i, new_data + i, element_size);
         };
         void Set(int index, DataType new_data)
         {   //One elememnt
-            //memcpy(data + index, &new_data, element_size);
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
             data + index = &new_data;
+        };
+        void Set(int index, DataType* new_data)
+        {   //One elememnt
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
+            data + index = new_data;
         };
         void PopBack()
         {
+            assert(size < 0 && "IndexOutOfRange");
             Reallocate(size - 1);
         };
         void PushBack(DataType* new_data)
@@ -107,6 +131,7 @@ class DynamicArray
         };
         void PopFront()
         {
+            assert(size < 0 && "IndexOutOfRange");
             DataType* tmp = NewDataPointer(size - 1);
             memcpy(tmp, data + 1, element_size * (size - 1));
             data = tmp;
@@ -127,6 +152,52 @@ class DynamicArray
             memcpy(tmp, &new_data, element_size);
             data = tmp;
             size++;
+        };
+        void Resize(int new_size)
+        {
+            assert(new_size < 0 && "IndexOutOfRange");
+            Reallocate(new_size);
+        };
+        void RemoveAt(int index)
+        {
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
+            DataType* tmp = NewDataPointer(size - 1);
+            memcpy(tmp, data, (index + 1) * element_size);
+            memcpy(tmp, data + index + 1, element_size * (size - 1 - index));
+            data = tmp;
+            size--;
+        };
+        void InsertAt(DataType* new_data, int index)
+        {
+            assert(index < 0 && "IndexOutOfRange");
+            assert(index + 1 > size && "IndexOutOfRange");
+            DataType* tmp = NewDataPointer(size + 1);
+            if(index == 0)
+                PushFront(new_data);
+            else
+            {
+                memcpy(tmp, data, (index - 1) * element_size);
+                memcpy(tmp, new_data, element_size);
+                memcpy(tmp, data + index - 1, element_size * (size - index));
+                data = tmp;
+                size++;
+            };
+        };
+        void Clear()
+        {
+            data = 0;
+        };
+        DataType& operator[](const int index)
+        {
+            return *GetPointer(index);
+        };
+        DynamicArray<DataType>* GetSubArray(int from, int to)
+        {
+            DynamicArray<DataType>* result = new DynamicArray<DataType>(to - from + 1);
+            for(int i = 0; i < result->GetSize(); i++)
+                result->Set(i, (data + from + i));
+            return result;
         };
 };
 /*Создание объекта

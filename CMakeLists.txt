@@ -13,4 +13,6 @@ add_executable(LAB2.exe
     src/DataTypes.h
     src/DynamicArray.h
     src/Interface.h
+    src/Deque.h
+    src/Sequence.h
 )
