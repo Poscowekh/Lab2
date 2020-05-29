@@ -1,8 +1,7 @@
 #pragma once
 #ifndef LINKELIST_H
 #define LINKELIST_H
-
-#include <cassert>
+#include "Exception.h"
 
 using namespace std;
 
@@ -17,15 +16,15 @@ class Node
     public:
         Node()
         {
-            data = 0;
-            next = 0;
-            prev = 0;
+            data = NULL;
+            next = NULL;
+            prev = NULL;
         };
         Node(DataType* new_data)
         {
             data = new_data;
-            next = 0;
-            prev = 0;
+            next = NULL;
+            prev = NULL;
         };
         Node(DataType* new_data, Node<DataType>* new_next,  Node<DataType>* new_prev)
         {
@@ -71,50 +70,77 @@ class LinkedList
         int length;
         Node<DataType>* head;
         Node<DataType>* tail;
+        bool empty;
         Node<DataType>* GetIndex(int index)
         {
-            Node<DataType>* tmp = head;
-            for(int i = 0; i < index; i++)
-                tmp = tmp->GetNext();
+            Node<DataType>* tmp;
+            if(index < length / 2)
+            {
+                tmp = head;
+                for(int i = 0; i < index; i++)
+                    tmp = tmp->GetNext();
+            }
+            else
+            {
+                tmp = tail;
+                for(int i = length - 1; i > index; i--)
+                    tmp = tmp->GetPrev();
+            };
             return tmp;
         };
         void SetIndex(int index, DataType* data)
         {
             GetIndex(index)->Set(data);
         };
-        Node<DataType>* GetLast()
-        {
-            return GetIndex(length - 1);
-        };
-        void SetLast(DataType* data)
-        {
-            GetLast()->Set(data);
-        };
     public:
         LinkedList()
         {
             length = 0;
-            head = new Node<DataType>();
+            head = NULL;
+            tail = NULL;
+            empty = true;
         };
-        LinkedList(const LinkedList<DataType> & list)
+        LinkedList(const LinkedList<DataType>& list)
         {
             length = list.length;
             head = list.head;
             tail = list.tail;
+            if(head == NULL)
+                empty = true;
+            else
+                empty = false;
         };
         LinkedList(DataType* new_data, int count)
         {
-            assert(count < 1 && "IndexOutOfRange");
+            if(count < 1)
+                try{
+                    throw 1;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                };
             for(int i = 0; i < count; i++)
                 PushBack(new_data + i);
+            if(length > 0)
+                empty = false;
+            else
+                empty = true;
         };
         void SetLength(int new_length)
         {
-            assert(new_length < 1 && "IndexOutOfRange");
-            if(new_length < length)
+            if(new_length < 1)
+            {
+                try{
+                    throw 1;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             for(int i = 0; i < new_length - length; i++)
                 PopBack();
             length = new_length;
+            if(length == 0)
+                empty = true;
         };
         int GetLength()
         {
@@ -122,7 +148,15 @@ class LinkedList
         };
         void PopBack()
         {
-            assert(length < 1 && "IndexOutOfRange");
+            if(length < 1)
+            {
+                try{
+                    throw 1;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             if(length > 1)
             {
                 GetIndex(length - 2)->SetNext(0);
@@ -130,52 +164,96 @@ class LinkedList
             }
             else
             {
-                head = 0;
-                tail = 0;
+                head = NULL;
+                tail = NULL;
             };
             length--;
+            if(length == 0)
+                empty = true;
         };
         void PushBack(DataType* new_data)
         {
-            Node<DataType>* tmp = new Node<DataType>(new_data);
-            if(length > 0)
-                GetLast()->SetNext(tmp);
-            else
-                head = tmp;
+            Node<DataType>* tmp = new Node<DataType>(new_data, NULL, tail);
             tail = tmp;
+            if(length == 0)
+                head = tmp;
+            empty = false;
             length++;
+        };
+        void PushBack(DataType new_data)
+        {
+            PushBack(&new_data);
         };
         void PopFront()
         {
-            assert(length < 1 && "IndexOutOfRange");
+            if(length < 1)
+            {
+                try{
+                    throw 1;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             head = head->GetNext();
             length--;
+            if(length == 0)
+                empty = true;
         };
         void PushFront(DataType* new_data)
         {
-            Node<DataType>* tmp = new Node<DataType>(new_data);
-            if(length != 0)
-                tmp->SetNext(head);
+            Node<DataType>* tmp = new Node<DataType>(new_data, GetIndex(0), NULL);
             head = tmp;
             if(length == 0)
-                tail = head;
+                tail = tmp;
             length++;
+            empty = false;
         };
-        DataType Front()
+        void PushFront(DataType new_data)
         {
-            assert(length < 1 && "IndexOutOfRange");
-            return head->Get();
+            PushFront(&new_data);
         };
         DataType* FrontPointer()
         {
-            assert(length < 1 && "IndexOutOfRange");
+            if(length < 1)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             return head->GetPointer();
+        };
+        DataType Front()
+        {
+            return *FrontPointer();
         };
         void Set(int index, DataType* data)
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
-            GetIndex(index)->Set(data);
+            if(index < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(length > 0)
+                GetIndex(index)->Set(data);
+            else
+                PushFront(data);
         };
         void Set(int index, DataType data)
         {
@@ -183,8 +261,24 @@ class LinkedList
         };
         void RemoveAt(int index)
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
+            if(index < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             if(index == 0)
                 PopFront();
             else
@@ -194,82 +288,224 @@ class LinkedList
                 else
                 {
                     GetIndex(index - 1)->SetNext(GetIndex(index)->GetNext());
+                    GetIndex(index)->GetNext()->SetPrev(GetIndex(index - 1));
                 };
             };
             length--;
+            if(length == 0)
+                empty = true;
         };
         void InsertAt(DataType* data, int index)
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
-            Node<DataType>* tmp = new Node<DataType>(data);
-            tmp->SetNext(GetIndex(index));
-            GetIndex(index - 1)->SetNext(tmp);
-            length++;
+            if(index < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index == 0)
+                PushFront(data);
+            else
+            {
+                Node<DataType>* tmp = new Node<DataType>(data, GetIndex(index), GetIndex(index - 1));
+                tmp->GetNext()->SetPrev(tmp);
+                tmp->GetPrev()->SetNext(tmp);
+                length++;
+            };
+            empty = false;
         };
         void Clear()
         {
-            head = 0;
-            tail = 0;
+            head = NULL;
+            tail = NULL;
             length = 0;
+            empty = true;
         };
-        DataType Get(int index)
+        void Sort()
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
-            return GetIndex(index)->Get();
+            for(int i = 0; i < length; i++)
+                for(int j = i; j < length; j++)
+                    if(Get(j) < Get(i))
+                    {
+                        DataType tmp = Get(i);
+                        Get(i) = Get(j);
+                        Get(i) = tmp;
+                    };
         };
         DataType* GetPointer(int index)
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
-            return GetIndex(index)->GetPointer();
+            if(index + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            DataType* tmp;
+            if(index == 0)
+                tmp = FrontPointer();
+            else
+            {
+                if(index == length - 1)
+                    tmp = BackPointer();
+                else
+                    GetIndex(index)->GetPointer();
+            };
+            return tmp;
         };
-        DataType Back()
+        DataType Get(int index)
         {
-            assert(length < 1 && "IndexOutOfRange");
-            return tail->Get();
+            return *GetPointer(index);
         };
         DataType* BackPointer()
         {
-            assert(length < 1 && "IndexOutOfRange");
+            if(length < 1)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             return tail->GetPointer();
+        };
+        DataType Back()
+        {
+            return *BackPointer();
         };
         LinkedList<DataType>* GetSubList(int from, int to)
         {
-            assert(from + 1 > length && "IndexOutOfRange");
-            assert(to + 1 > length && "IndexOutOfRange");
-            assert(from < 0 && "IndexOutOfRange");
-            assert(to < 0 && "IndexOutOfRange");
-            assert(from > to && "IndexOutOfRange");
+            if(from + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(to + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(from < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(to < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(from > to)
+            {
+                try{
+                    throw 1;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             LinkedList<DataType>* sublist = new LinkedList<DataType>();
-            for(int i = from; i <= to; i++)
-                sublist->PushBack(GetPointer(i));
+            sublist->head = GetIndex(from);
+            sublist->tail = GetIndex(to);
+            sublist->length = to - from + 1;
+            sublist->empty = false;
             return sublist;
         };
         DataType& operator[](const int index)
         {
-            assert(index < 0 && "IndexOutOfRange");
-            assert(index + 1 > length && "IndexOutOfRange");
+            if(index + 1 > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            if(index < 0)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
             return *GetPointer(index);
         };
+        bool Empty()
+        {
+            return empty;
+        };
+        LinkedList<DataType>& operator+(const LinkedList<DataType>& list2)
+        {
+            Node<DataType>* tmp = list2.head;
+            tmp->GetPrev() = tail;
+            tail->SetNext() = tmp;
+            tail = NULL;
+            length += list2.length;
+            if(length > 0)
+                empty = false;
+        }
+        void operator+=(const Node<DataType>& node)
+        {
+            PushBack(node);
+        };
+        void operator-=(const int amount)
+        {
+            if(amount > length)
+            {
+                try{
+                    throw 0;
+                } catch(int code){
+                    Exception* a = new Exception(code);
+                    delete a;
+                };
+            };
+            for(int i = 0; i < amount; i++)
+                PopBack();
+        };
 
-        /*
-        LinkedList(T* items, int count); //Копировать элементы из переданного массива
-        LinkedList(); Создать пустой список
-        LinkedList(LinkedList <T> & list const); //Копирующий конструктор
-
-        Декомпозиция
-        T GetFirst();
-        T GetLast();
-        DataType Get(int index);
-        LinkedList<DataType>* GetSubList(int startIndex, int endIndex);
-        Может выбрасывать исключения:
-        − IndexOutOfRange (если хотя бы один из индексов отрицательный
-        или больше/равен числу элементов)
-        Получить список из всех
-        элементов, начиная с startIndex и
-        заканчивая endIndex.*/
 };
 
 #endif // LINKELIST_H

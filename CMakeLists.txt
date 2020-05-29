@@ -9,10 +9,10 @@ project(Lab2
 
 add_executable(LAB2.exe
     src/Main.cpp
-    src/LinkedList.h
-    src/DataTypes.h
-    src/DynamicArray.h
-    src/Interface.h
-    src/Deque.h
-    src/Sequence.h
+    src/RandomGen.hpp
+    src/Example.hpp
+    src/Tests.hpp
+    src/Interface.hpp
 )
+
+include_directories(headers)

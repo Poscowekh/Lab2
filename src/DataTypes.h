@@ -4,10 +4,10 @@
 #include <iostream>
 #include <utility>
 #include <string>
-
-//No log
+#include <random>
 
 using namespace std;
+
 template <class TypeReal, class TypeIm>
 class Complex
 {
@@ -30,13 +30,28 @@ class Complex
             real = pair.first;
             imaginary = pair.second;
         };
-        string StringComplex()
+        Complex(size_t seed)
         {
-            string result = to_string(real) + '+' + to_string(imaginary) + 'i';
+            srand(seed);
+            float rand_float;
+            rand_float = (rand() % 1001) / (rand() % 1001);
+            real = rand_float;
+            seed++;
+            srand(seed);
+            rand_float = (rand() % 1001) / (rand() % 1001);
+            imaginary = rand_float;
+        };
+        string ComplexToString()
+        {
+            string result;
+            if(imaginary >= 0)
+                result = to_string(real) + '+' + to_string(imaginary) + 'i';
+            else
+                result = to_string(real) + to_string(imaginary) + 'i';
             return result;
         };
         void PrintComplex(){
-            cout << StringComplex() << endl;
+            cout << ComplexToString() << endl;
         };
         TypeReal GetReal(){
             return real;
@@ -124,6 +139,10 @@ class Complex
             imaginary -= 1;
             real -= 1;
             return *this;
+        };
+        bool operator<(const Complex<TypeReal, TypeIm>& complex) const  //wrong
+        {
+            return (this->real < complex.real);
         };
 };
 
