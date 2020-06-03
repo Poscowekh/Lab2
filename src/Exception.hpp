@@ -8,7 +8,6 @@ using namespace std;
 class Exception
 {
     public:
-        //Exception(){};
         Exception(const int code)
         {
             switch(code)
@@ -19,6 +18,10 @@ class Exception
                 break;
                 case 1:
                     cout << "Error code 1: Wrong Length!" << endl;
+                    exit(code + 1000);
+                break;
+                case 2:
+                    cout << "Error code 2: Null pointer!" << endl;
                     exit(code + 1000);
                 break;
             };

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <utility>
 #include <string>
-#include <random>
 
 using namespace std;
 
@@ -29,17 +28,6 @@ class Complex
         {
             real = pair.first;
             imaginary = pair.second;
-        };
-        Complex(size_t seed)
-        {
-            srand(seed);
-            float rand_float;
-            rand_float = (rand() % 1001) / (rand() % 1001);
-            real = rand_float;
-            seed++;
-            srand(seed);
-            rand_float = (rand() % 1001) / (rand() % 1001);
-            imaginary = rand_float;
         };
         string ComplexToString()
         {
@@ -139,10 +127,6 @@ class Complex
             imaginary -= 1;
             real -= 1;
             return *this;
-        };
-        bool operator<(const Complex<TypeReal, TypeIm>& complex) const  //wrong
-        {
-            return (this->real < complex.real);
         };
 };
 

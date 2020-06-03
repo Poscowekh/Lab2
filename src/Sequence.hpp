@@ -1,8 +1,9 @@
 #pragma once
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
-#include "DynamicArray.h"
-#include "LinkedList.h"
+#include "DynamicArray.hpp"
+#include "LinkedList.hpp"
+#include "Function.hpp"
 
 using namespace std;
 
@@ -23,6 +24,9 @@ class Sequence
         //virtual void Concate(Sequence<DataType>* other) = 0;
         //virtual Sequence<DataType>* GetCopy() = 0;
         virtual void CopyTo(Sequence<DataType>* to, int from_index, int to_index) = 0;
+        virtual DataType Reduce(Function<DataType, DataType> function, DataType const_value) = 0;
+        virtual Sequence<DataType>* Map(Function<DataType, DataType> function) = 0;
+        virtual Sequence<DataType>* Where(Function<bool, DataType> function) = 0;
         virtual ~Sequence(){};
 };
 
@@ -142,12 +146,29 @@ class ArraySequence
             else
                 to->empty = true;
         };
-        ~ArraySequence()
+        ArraySequence<DataType>* Map(Function<DataType, DataType> function)
         {
-            length = 0;
-            empty = true;
-            delete array;
+            ArraySequence<DataType>* result = new ArraySequence<DataType>();
+            for(int i = 0; i < length; i++)
+                result->Append(function(Get(i)));
+            return result;
         };
+        ArraySequence<DataType>* Where(Function<DataType, DataType> function)
+        {
+            ArraySequence<DataType>* result = new ArraySequence<DataType>();
+            for(int i = 0; i < length; i++)
+                if(function(Get(i)))
+                    result->Append(Get(i));
+            return result;
+        };
+        DataType Reduce(Function<DataType, DataType> function, DataType const_value)
+        {
+            DataType result = function(Get(0), const_value);
+            for(size_t i = 1; i < length; ++i)
+                result = function(Get(i), result);
+            return result;
+        };
+        ~ArraySequence(){};
 };
 
 template <class DataType>
@@ -157,6 +178,13 @@ class LinkedListSequence
         LinkedList<DataType>* list;
         int length;
         bool empty;
+        void CheckEmpty()
+        {
+            if(length > 0)
+                empty = false;
+            else
+                empty = true;
+        };
     public:
         LinkedListSequence()
         {
@@ -175,7 +203,16 @@ class LinkedListSequence
         };
         LinkedListSequence(const LinkedList<DataType>& from)
         {
-            list = from;
+            list = new LinkedList<DataType>(from);
+            length = list->GetLength();
+            if(length > 0)
+                empty = false;
+            else
+                empty = true;
+        };
+        LinkedListSequence(const LinkedListSequence<DataType>& from)
+        {
+            list = new LinkedList<DataType>(*from.list);
             length = list->GetLength();
             if(length > 0)
                 empty = false;
@@ -192,45 +229,52 @@ class LinkedListSequence
         };
         DataType GetFirst()
         {
-            return *list->FrontPointer();
+            return list->Front();
         };
         DataType Get(const int index)
         {
             return list->Get(index);
         };
-        DataType* GetPointer(const int index)
-        {
-            return list->GetPointer(index);
-        };
         DataType GetLast()
         {
-            return *list->BackPointer();
+            return list->Back();
         };
         LinkedListSequence<DataType>* GetSubsequence(const int from, const int to)
         {
             LinkedListSequence<DataType>* result = new LinkedListSequence<DataType>();
-            result->list = list->GetSubList(from, to);
-            length = list->GetLength();
-            if(length > 0)
-                result->empty = false;
+            result->list = list->GetSublist(from, to);
+            result->length = result->list->GetLength();
+            CheckEmpty();
             return result;
         };
-        void Append(DataType* data)
+        void Append(DataType data)
         {
             list->PushBack(data);
             length++;
             empty = false;
         };
-        void Prepend(DataType* data)
+        void Append(DataType* data)
+        {
+            Append(*data);
+        };
+        void Prepend(DataType data)
         {
             list->PushFront(data);
             length++;
             empty = false;
         };
-        void InsertAt(const int index, DataType* data)
+        void Prepend(DataType* data)
+        {
+            Prepend(*data);
+        };
+        void InsertAt(const int index, DataType data)
         {
             list->InsertAt(data, index);
             length++;
+        };
+        void InsertAt(const int index, DataType* data)
+        {
+            InsertAt(*data, index);
         };
         void RemoveAt(const int index)
         {
@@ -245,9 +289,40 @@ class LinkedListSequence
             length = 0;
             empty = true;
         };
+        void PopBack()
+        {
+            list->PopBack();
+            length--;
+            CheckEmpty();
+        };
+        void PopBack(int cut)
+        {
+            list->PopBack(cut);
+            length--;
+            CheckEmpty();
+        };
+        void PopFront()
+        {
+            list->PopFront();
+            length--;
+            CheckEmpty();
+        };
+        void PopFront(int cut)
+        {
+            list->PopFront(cut);
+            length--;
+            CheckEmpty();
+        };
         void Concate(LinkedListSequence<DataType>* other)
         {
-            list->CopyToArray(other->list->FrontPointer(), 0, other->list->GetSize());
+            list = list->ConcateFrom(*other->list);
+            length = list->GetLength();
+            if(length > 0)
+                empty = false;
+        };
+        void Concate(LinkedList<DataType>* other)
+        {
+            list->ConcateFrom(other);
             length = list->GetSize();
             if(length > 0)
                 empty = false;
@@ -262,7 +337,7 @@ class LinkedListSequence
         };
         void CopyTo( LinkedListSequence<DataType>* to, int from_index, int to_index)
         {
-            to->list = list->GetSubArray(from_index, to_index);
+            to->list = list->GetSublist(from_index, to_index);
             if(to->length > 0)
                 to->empty = false;
             else
@@ -270,13 +345,30 @@ class LinkedListSequence
         };
         DataType& operator[](const int index)
         {
-            return *(GetPointer(index));
+            return (*list)[index];
         };
-        ~LinkedListSequence()
+        ~LinkedListSequence(){};
+        LinkedListSequence<DataType>* Map(Function<DataType, DataType> function)
         {
-            delete list;
-            empty = true;
-            length = 0;
+            LinkedListSequence<DataType>* result = new LinkedListSequence<DataType>();
+            for(int i = 0; i < length; i++)
+                result->Append(function(Get(i)));
+            return result;
+        };
+        LinkedListSequence<DataType>* Where(Function<DataType, DataType> function)
+        {
+            LinkedListSequence<DataType>* result = new LinkedListSequence<DataType>();
+            for(int i = 0; i < length; i++)
+                if(function(Get(i)))
+                    result->Append(Get(i));
+            return result;
+        };
+        DataType Reduce(Function<DataType, DataType> function, DataType const_value)
+        {
+            DataType result = function(Get(0), const_value);
+            for(size_t i = 1; i < length; ++i)
+                result = function(Get(i), result);
+            return result;
         };
 };
 

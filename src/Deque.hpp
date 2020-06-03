@@ -1,9 +1,7 @@
 #pragma once
 #ifndef DEQUE_H
 #define DEQUE_H
-#include "DynamicArray.h"
-#include "LinkedList.h"
-#include "Sequence.h"
+#include "Sequence.hpp"
 
 using namespace std;
 
@@ -11,33 +9,34 @@ template<class DataType>
 class Deque
 {
     private:
-        LinkedListSequence<DataType>* data;
+        LinkedListSequence<DataType> data;
         int size;
         bool empty;
+        void CheckEmpty()
+        {
+            if(size > 0)
+                empty = false;
+            else
+                empty = true;
+        };
     public:
         Deque()
         {
             size = 0;
             empty = true;
-            data = new LinkedListSequence<DataType>();
+            data = LinkedListSequence<DataType>();
         };
         Deque(const DataType* new_data, const int count)
         {
-            data = new LinkedListSequence<DataType>(new_data, count);
+            data = LinkedListSequence<DataType>(new_data, count);
             size = count;
-            if(size > 0)
-                empty = false;
-            else
-                empty = true;
+            CheckEmpty();
         };
-        Deque(LinkedListSequence<DataType>* new_data)
+        Deque(const Deque<DataType>& deque)
         {
-            data = new LinkedListSequence<DataType>(new_data);
-            size = new_data->GetLength();
-            if(size > 0)
-                empty = false;
-            else
-                empty = true;
+            data = LinkedListSequence<DataType>(deque.data);
+            size = deque.size;
+            CheckEmpty();
         };
         int GetSize()
         {
@@ -47,61 +46,51 @@ class Deque
         {
             return empty;
         };
-        DataType Get(const int index) const
+        DataType Get(int index)
         {
-            return data->Get(index);
-        };
-        DataType* GetPointer(const int index) const
-        {
-            return data->GetPointer(index);
+            return data.Get(index);
         };
         void PopBack()
         {
-            data->RemoveAt(data->GetLength() - 1);
+            data.PopBack();
             size--;
-            if(size == 0)
-                empty = true;
+            CheckEmpty();
         };
         void PopFront()
         {
-            data->RemoveAt(0);
+            data.PopFront();
             size--;
-            if(size == 0)
-                empty = true;
+            CheckEmpty();
         };
         void PushBack(DataType new_data)
         {
-            data->Append(&new_data);
+            data.Append(new_data);
             size++;
             empty = false;
         };
         void PushBack(DataType* new_data)
         {
-            data->Append(new_data);
-            size++;
-            empty = false;
+            PushBack(&new_data);
         };
         void PushFront(DataType new_data)
         {
-            data->Prepend(&new_data);
+            data.Prepend(new_data);
             size++;
             empty = false;
         };
         void PushFront(DataType* new_data)
         {
-            data->Prepend(new_data);
-            size++;
-            empty = false;
+            PushFront(new_data);
         };
         void Clear()
         {
-            data->RemoveAll();
+            data.RemoveAll();
             size = 0;
             empty = true;
         };
         DataType& operator[](const int index)
         {
-            return *(GetPointer(index));
+            return data[index];
         };
         Deque& operator=(const Deque& deque)
         {
@@ -112,11 +101,12 @@ class Deque
         };
         ~Deque()
         {
-            data->~LinkedListSequence<DataType>();
+            data.~LinkedListSequence<DataType>();
             delete data;
             size = 0;
             empty = true;
-        }
+            delete this;
+        };
 };
 
 #endif // DEQUE_H
