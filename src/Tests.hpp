@@ -6,60 +6,122 @@
 
 using namespace std;
 
+int overall_errors = 0;
+
 typedef enum
 {
     ERROR,
     NO_ERROR
 } Check;
 
-//Array
-Check TestArrayCreate(int seed)
+class Test
 {
-    DynamicArray<int>* array = new DynamicArray<int>();
-    int a = RandomInt(seed);
-    seed++;
-    if(array->GetSize() != 0)
+    private:
+        void Realloc(int new_size)
+        {
+            TestFunction<Check>* tmp = (TestFunction<Check>*)malloc(new_size * el_size);
+            memcpy(tmp, functions, count * el_size);
+            free(functions);
+            functions = tmp;
+        };
+        int el_size;
+        int errors;
+        string name;
+        TestFunction<Check>* functions;
+        int count;
+    public:
+        Test(string test_name)
+        {
+            name = test_name;
+            count = 0;
+            functions = 0;
+            errors = 0;
+            el_size = sizeof(TestFunction<Check>);
+        };
+        void AddTest(string func_name, Check(*const func)())
+        {
+            TestFunction<Check>* new_func = new TestFunction<Check>(func_name, func);
+            Realloc(count + 1);
+            memcpy(functions + count, new_func, el_size);
+            count++;
+        };
+        void RunTests()
+        {
+            Check check;
+            TestFunction<Check>* tmp;
+            cout << "Testing " << name << "..." << endl;
+            for(int i = 0; i < count; i++)
+            {
+                tmp = functions + i;
+                check = tmp->function();
+                cout << "   " << "test " << i + 1 << ": " << tmp->function_name << " - ";
+                if(check == ERROR)
+                {
+                    errors++;
+                    overall_errors++;
+                    cout << "error" << endl;
+                }
+                else
+                    cout << "no errors" << endl;
+            };
+            cout << "Errors found: " << errors << endl << "Test Finished." << endl;
+        };
+};
+
+//Array
+Check TestArrayCreate()
+{
+    srand(time(NULL));
+    DynamicArray<int>* array;
+    int size = rand() % 1000 + 1;
+    array = new DynamicArray<int>();
+    if(array->GetLength() != 0)
         return ERROR;
-    array = new DynamicArray<int>(a);
-    a = RandomInt(seed);
-    seed++;
-    if(array->GetSize() != a)
+    array = new DynamicArray<int>(size);
+    if(array->GetLength() != size)
         return ERROR;
-    a = RandomInt(seed);
-    seed++;
-    int* b = (int*)malloc(sizeof(int) * a);
-    memcpy(b, &a, sizeof(int) * a);
-    array = new DynamicArray<int>(b, a);
-    if(array->GetSize() != a)
+    int* data = (int*)malloc(sizeof(int) * size);
+    for(int i = 0; i < size; i++)
+        memcpy(data + i, &size, sizeof(int));
+    array = new DynamicArray<int>(data, size);
+    if(array->GetLength() != size)
         return ERROR;
+    for(int i = 0; i < array->GetLength(); i++)
+        if(array->Get(i) != size)
+            return ERROR;
     DynamicArray<int>* array_copy = new DynamicArray<int>(*array);
-    if(array_copy->GetSize() != a)
+    if(array_copy->GetLength() != size)
         return ERROR;
+    for(int i = 0; i < array_copy->GetLength(); i++)
+        if(array_copy->Get(i) != size)
+            return ERROR;
     delete array;
     delete array_copy;
     return NO_ERROR;
 };
 
-Check TestArraySetGet(int seed)
+Check TestArraySetGet()
 {
-    int a = RandomInt(seed);
+    int seed = time(NULL);
+    int size = RandomInt(seed);
     seed++;
-    DynamicArray<int>* array = new DynamicArray<int>(a);
-    int b = RandomInt(seed);
+    DynamicArray<int>* array = new DynamicArray<int>(size);
+    int tmp = RandomInt(seed);
     seed++;
-    for(int i = 0; i < a; i++)
+    for(int i = 0; i < size; i++)
     {
-        array->Set(i, b);
+        array->Set(i, tmp);
     };
-    for(int i = 0; i < a; i++)
-        if(array->Get(i) != b)
+    for(int i = 0; i < size; i++)
+        if(array->Get(i) != tmp)
             return ERROR;
     delete array;
     return NO_ERROR;
 };
 
-Check TestArrayPushPop(int seed)
+Check TestArrayPushPop()
 {
+    int seed = time(NULL);
     DynamicArray<int>* array = new DynamicArray<int>();
     int r_size = RandomInt(seed);
     seed++;
@@ -67,40 +129,42 @@ Check TestArrayPushPop(int seed)
     seed++;
     for(int i = 0; i < r_size; i++)
         array->PushFront(a);
-    if(array->GetSize() != r_size)
+    if(array->GetLength() != r_size)
         return ERROR;
-    for(int i = 0; i < array->GetSize(); i++)
+    for(int i = 0; i < array->GetLength(); i++)
         if(array->Get(i) != a)
             return ERROR;
     int tmp = RandomInt(seed) % r_size;
     seed++;
     for(int i = 0; i < tmp; i++)
         array->PopFront();
-    if(array->GetSize() != r_size - tmp)
+    if(array->GetLength() != r_size - tmp)
         return ERROR;
+    array->Clear();
     r_size = RandomInt(seed);
     seed++;
     a = RandomInt(seed);
     seed++;
     for(int i = 0; i < r_size; i++)
         array->PushBack(a);
-    if(array->GetSize() != r_size)
+    if(array->GetLength() != r_size)
         return ERROR;
-    for(int i = 0; i < array->GetSize(); i++)
+    for(int i = 0; i < array->GetLength(); i++)
         if(array->Get(i) != a)
             return ERROR;
     tmp = RandomInt(seed) % r_size;
     seed++;
     for(int i = 0; i < tmp; i++)
         array->PopBack();
-    if(array->GetSize() != r_size - tmp)
+    if(array->GetLength() != r_size - tmp)
         return ERROR;
     delete array;
     return NO_ERROR;
 };
 
-Check TestArrayInsertRemove(int seed)
+Check TestArrayInsertRemove()
 {
+    int seed = time(NULL);
     DynamicArray<int>* array1 = new DynamicArray<int>();
     int r_size = RandomInt(seed);
     seed++;
@@ -111,12 +175,12 @@ Check TestArrayInsertRemove(int seed)
         array1->PushBack(a);
     };
     DynamicArray<int>* array2 = new DynamicArray<int>(*array1);
-    int a = RandomInt(seed) % (array2->GetSize() - 2) + 1;
+    int a = RandomInt(seed) % (array2->GetLength() - 2) + 1;
     seed++;
     int b = RandomInt(seed);
     seed++;
     array2->InsertAt(b, a);
-    if(array2->GetSize() != array1->GetSize() + 1)
+    if(array2->GetLength() != array1->GetLength() + 1)
         return ERROR;
     if(array2->Get(a - 1) != array1->Get(a - 1))
         return ERROR;
@@ -125,7 +189,7 @@ Check TestArrayInsertRemove(int seed)
     if(array2->Get(a + 1) != array1->Get(a))
         return ERROR;
     array2->RemoveAt(a);
-    if(array2->GetSize() != array1->GetSize())
+    if(array2->GetLength() != array1->GetLength())
         return ERROR;
     if(array2 != array1)
         return ERROR;
@@ -134,8 +198,9 @@ Check TestArrayInsertRemove(int seed)
     return NO_ERROR;
 };
 
-Check TestArraySubArray(int seed)
+Check TestArraySubArray()
 {
+    int seed = time(NULL);
     DynamicArray<int>* array1 = new DynamicArray<int>();
     int r_size = RandomInt(seed);
     seed++;
@@ -143,12 +208,12 @@ Check TestArraySubArray(int seed)
     seed++;
     for(int i = 0; i < r_size; i++)
         array1->PushBack(a);
-    int b = RandomInt(seed) % (array1->GetSize() / 2);
-    int c = RandomInt(seed) % (array1->GetSize() / 2) + array1->GetSize() / 2;
+    int b = RandomInt(seed) % (array1->GetLength() / 2);
+    int c = RandomInt(seed) % (array1->GetLength() / 2) + array1->GetLength() / 2;
     DynamicArray<int>* array2 = array1->GetSubArray(b, c);
-    if(array2->GetSize() != c - b + 1)
+    if(array2->GetLength() != c - b + 1)
         return ERROR;
-    for(int i = 0; i < array2->GetSize(); i++)
+    for(int i = 0; i < array2->GetLength(); i++)
         if(array2->Get(i) != a)
             return ERROR;
     delete array1;
@@ -156,8 +221,9 @@ Check TestArraySubArray(int seed)
     return NO_ERROR;
 };
 
-Check TestArrayConcate(int seed)
+Check TestArrayConcate()
 {
+    int seed = time(NULL);
     DynamicArray<int>* array1 = new DynamicArray<int>();
     DynamicArray<int>* array2 = new DynamicArray<int>();
     DynamicArray<int>* array3 = new DynamicArray<int>();
@@ -175,12 +241,12 @@ Check TestArrayConcate(int seed)
         array2->PushBack(b);
     array3->ConcateTo(*array2);
     array3->ConcateTo(*array1);
-    if(array3->GetSize() != array1->GetSize() + array2->GetSize())
+    if(array3->GetLength() != array1->GetLength() + array2->GetLength())
         return ERROR;
-    for(int i = 0; i < array2->GetSize(); i++)
+    for(int i = 0; i < array2->GetLength(); i++)
         if(array3->Get(i) != array2->Get(i))
             return ERROR;
-    for(int i = array2->GetSize() - 1; i < array1->GetSize() + array2->GetSize(); i++)
+    for(int i = array2->GetLength() - 1; i < array1->GetLength() + array2->GetLength(); i++)
         if(array3->Get(i) != array1->Get(i))
             return ERROR;
     delete array1;
@@ -189,86 +255,16 @@ Check TestArrayConcate(int seed)
     return NO_ERROR;
 };
 
-Check TestArraySort(int seed)
+void TestArray()
 {
-    DynamicArray<int>* array = new DynamicArray<int>();
-    int r_size = RandomInt(seed);
-    seed++;
-    for(int i = 0; i < r_size; i++)
-    {
-        int a = RandomInt(seed);
-        seed++;
-        array->PushBack(a);
-    };
-    array->Sort();
-    for(int i = 0; i < array->GetSize(); i++)
-        if(array->Front() > array->Get(i))
-            return ERROR;
-    delete array;
-    return NO_ERROR;
-};
-
-void TestArray(int seed)
-{
-    cout << "Testing array..." << endl;
-    const short array_tests = 7;
-    for(int i = 0; i < array_tests; i++)
-    {
-        seed++;
-        cout << "   Test " << i << ": ";
-        switch(i)
-        {
-            case 0:
-                cout << "Create = ";
-                if(TestArrayCreate(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 1:
-                cout << "Set & Get = ";
-                if(TestArraySetGet(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 2:
-                cout << "Push & Pop = ";
-                if(TestArrayPushPop(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 3:
-                cout << "Insert & Remove = ";
-                if(TestArrayInsertRemove(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 4:
-                cout <<  "Subarray = ";
-                if(TestArraySubArray(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 5:
-                cout <<  "Concate = ";
-                if(TestArrayConcate(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-            case 6:
-                cout <<  "Sort = ";
-                if(TestArraySort(seed) == ERROR)
-                    cout << "ERROR" << endl;
-                else
-                    cout << "NO ERRORS" << endl;
-            break;
-        };
-    };
+    Test* array_test = new Test("array");
+    //array_test->AddTest("Create Array", TestArrayCreate);
+    //array_test->AddTest("Set/Get Array", TestArraySetGet);
+    array_test->AddTest("Push/Pop Array", TestArrayPushPop);
+    /*array_test->AddTest("InsertAt/RemoveAt Array", TestArrayInsertRemove);
+    array_test->AddTest("SubArray", TestArraySubArray);
+    array_test->AddTest("Concate Arrays", TestArrayConcate);*/
+    array_test->RunTests();
 };
 
 /*
@@ -339,18 +335,18 @@ array.PushFront(complex2);
 array.PushFront(complex1);
 array.PushBack(complex3);
 array.PushBack(complex4);
-for(int i = 0; i < array.GetSize(); i++)
+for(int i = 0; i < array.GetLength(); i++)
     array[i].PrintComplex();
 cout << endl;
 DynamicArray< Complex<int, int> > array_copy = DynamicArray< Complex<int, int> >(array);
-array_copy.RemoveAt(array_copy.GetSize() - 1);
+array_copy.RemoveAt(array_copy.GetLength() - 1);
 array_copy.PopFront();
 array_copy.PopBack();
 array_copy.InsertAt(&complex4, 0);
 array_copy.InsertAt(&complex1, 0);
 array_copy.InsertAt(&complex5, 2);
-array_copy.InsertAt(&complex3, array_copy.GetSize() - 1);
-for(int i = 0; i < array_copy.GetSize(); i++)
+array_copy.InsertAt(&complex3, array_copy.GetLength() - 1);
+for(int i = 0; i < array_copy.GetLength(); i++)
     array_copy[i].PrintComplex();
 cout << endl;
 */
@@ -363,7 +359,7 @@ LinkedListSequence< Complex<float, float> >* list_subsequence;
 seed += RandomInt(seed);
 seed -= RandomInt(seed);
 cout << "List sequence:" << endl;
-for(int i = 0; i < arr->GetSize(); i++)
+for(int i = 0; i < arr->GetLength(); i++)
     list_sequence.Prepend(arr->GetPointer(i));
 for(int i = 0; i < list_sequence.GetLength(); i++)
     cout << list_sequence.Get(i).StringComplex() << endl;
@@ -382,18 +378,19 @@ if(deque.Empty())
     cout << "EMPTY" << endl;
 DynamicArray< Complex<int, int> >* arr = IntComplexArray(seed, rand() % 4 + 2);
 cout << "Some array:" << endl;
-for(int i = 0; i < arr->GetSize(); i++)
+for(int i = 0; i < arr->GetLength(); i++)
     cout << arr->Get(i).ComplexToString() << endl;
 cout << endl << "Deque:" << endl;
-for(int i = 0; i < arr->GetSize(); i++)
+for(int i = 0; i < arr->GetLength(); i++)
     deque.PushFront(arr->GetPointer(i));
-for(int i = 0; i < deque.GetSize(); i++)
+for(int i = 0; i < deque.GetLength(); i++)
     deque[i].PrintComplex();
 seed++;
 */
 
 void test_main()
 {
-    int seed = time(NULL);
-    //TestArrayCreate(seed);
+    cout << endl;
+    TestArray();
+    getchar();
 };

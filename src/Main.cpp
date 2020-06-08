@@ -8,7 +8,6 @@
 using namespace std;
 int main()
 {
-    Example();
-    //test_main();
+    StartMenu();
     return 0;
 }

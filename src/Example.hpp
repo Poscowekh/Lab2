@@ -1,5 +1,4 @@
 #pragma once
-#include "DataTypes.hpp"
 #include "Deque.hpp"
 #include "RandomGen.hpp"
 #include <time.h>
@@ -13,111 +12,57 @@ int RandomSeed(int seed)
     return seed;
 };
 
-//FOR INTS
-void ExampleIntList(DynamicArray<int>* arr)
-{
-    cout << endl << "List from this ints:" << endl;
-    LinkedList< int>* list = new LinkedList<int>();
-    for(int i = 0; i < arr->GetSize(); i++)
-        list->PushBack(arr->Get(i));
-    for(int i = 0; i < list->GetLength(); i++)
-        cout << list->Get(i) << ' ';
-    cout << endl << "List-copy:" << endl;
-    LinkedList<int>* list_copy = new LinkedList<int>(*list);
-    for(int i = 0; i < list_copy->GetLength(); i++)
-        cout << list_copy->Get(i) << ' ';
-    cout << endl << "Sublist from 2 to 6:" << endl;
-    list_copy = list_copy->GetSublist(2, 6);
-    for(int i = 0; i < list_copy->GetLength(); i++)
-        cout << list_copy->Get(i) << ' ';
-    cout << endl << "Concated lists" << endl;
-    list = list->Concate(*list, *list_copy);
-    for(int i = 0; i < list->GetLength(); i++)
-        cout << list->Get(i) << ' ';
-    cout << endl << "Copy from array" << endl;
-    LinkedList<int>* copy_array = new LinkedList<int>(arr->DataPointer(), arr->GetSize());
-    for(int i = 0; i < copy_array->GetLength(); i++)
-        cout << copy_array->Get(i) << ' ';
-};
-
-void ExampleIntArray(DynamicArray<int>* arr)
-{
-    cout << endl << "Array from this ints:" << endl;
-    DynamicArray<int>* array = new DynamicArray<int>(arr->DataPointer(), arr->GetSize());
-    for(int i = 0; i < array->GetSize(); i++)
-        cout << array->Get(i) << ' ';
-    cout << endl << "Array-copy" << endl;
-    DynamicArray<int>* array_copy = new DynamicArray<int>(*array);
-    for(int i = 0; i < array_copy->GetSize(); i++)
-        cout << array_copy->Get(i) << ' ';
-    cout << endl << "Subarray from 2 to 5:" << endl;
-    DynamicArray<int>* subarray = array_copy->GetSubArray(2, 5);
-    for(int i = 0; i < subarray->GetSize(); i++)
-        cout << subarray->Get(i) << ' ';
-    cout << endl << "Concated arrays:" << endl;
-    array_copy->ConcateTo(*subarray);
-    for(int i = 0; i < array_copy->GetSize(); i++)
-        cout << array_copy->Get(i) << ' ';
-};
-
-void ExampleIntSequence(DynamicArray<int>* arr)
-{
-    cout << endl << "List sequence from this ints:" << endl;
-    LinkedListSequence<int>* list_sequence = new LinkedListSequence<int>(arr->DataPointer(), arr->GetSize());
-    for(int i = 0; i < list_sequence->GetLength(); i++)
-        cout << list_sequence->Get(i) << ' ';
-    cout << endl << "List sequence - copy:" << endl;
-    LinkedListSequence<int>* list_sequence_copy = new LinkedListSequence<int>(*list_sequence);
-    for(int i = 0; i < list_sequence_copy->GetLength(); i++)
-        cout << list_sequence_copy->Get(i) << ' ';
-    cout << endl << "List sequence - subsequence from 2 to 6:" << endl;
-    list_sequence_copy = list_sequence_copy->GetSubsequence(2, 6);
-    for(int i = 0; i < list_sequence_copy->GetLength(); i++)
-        cout << list_sequence_copy->Get(i) << ' ';
-    list_sequence->Concate(list_sequence_copy);
-    cout << endl << "Concated sequences" << endl;
-    for(int i = 0; i < list_sequence->GetLength(); i++)
-        cout << list_sequence->Get(i) << ' ';
-    Function<int, int>* f = new Function<int, int>("reducer", 1);
-
-};
-
-void ExampleIntDeque(DynamicArray<int>* arr)
-{
-    cout << endl << endl << "Deque from this ints:" << endl;
-    Deque<int>* deque = new Deque<int>();
-    for(int i = 0; i < arr->GetSize(); i++)
-        deque->PushFront(arr->Get(i));
-    for(int i = 0; i < deque->GetSize(); i++)
-        cout << deque->Get(i) << ' ';
-    cout << endl << "Deque-copy:" << endl;
-    Deque<int>* deque_copy = new Deque<int>(*deque);
-    for(int i = 0; i < deque_copy->GetSize(); i++)
-        cout << deque_copy->Get(i) << ' ';
-};
-
-void ExampleInt(int seed)
-{
-    cout << "Some ints:" << endl;
-    DynamicArray<int>* arr = IntArray(seed, 8);
-    seed = RandomSeed(seed);
-    for(int i = 0; i < arr->GetSize(); i++)
-        cout << arr->Get(i) << ' ';
-    //getchar();
-    //ExampleIntList(arr);
-    //getchar();
-    //ExampleIntArray(arr);
-    //getchar();
-    ExampleIntSequence(arr);
-    //getchar();
-    //ExampleIntDeque(arr);
-    //getchar();
-    delete arr;
-};
-
 //MAIN EXAMPLE
 void Example()
 {
-    int seed = time(NULL);
-    ExampleInt(seed);
+    int seed = RandomSeed(time(NULL));
+    int size = rand() % 5 + 7;
+    seed = RandomSeed(seed);
+    DynamicArray<int>* array = IntArray(seed, size);
+    seed = RandomSeed(seed);
+    cout << "RANDOM DEQUE" << endl;
+    Deque<int>* deque1 = new Deque<int>(array);
+    deque1->PrintDeque();
+    getchar();
+    cout << "DEQUE - COPY" << endl;
+    Deque<int>* deque2 = new Deque<int>(*deque1);
+    deque2->PrintDeque();
+    getchar();
+    deque1->PopBack();
+    deque1->PopFront();
+    seed = RandomSeed(seed);
+    deque1->PushBack(RandomInt(seed));
+    seed = RandomSeed(seed);
+    deque1->PushFront(RandomInt(seed));
+    cout << "DEQUE - POP & PUSH" << endl;
+    deque1->PrintDeque();
+    getchar();
+    cout << "DEQUE - Sort" << endl;
+    deque2 = Sort(deque1);
+    deque2->PrintDeque();
+    getchar();
+    cout << "DEQUE - MAP" << endl;
+    deque2 = Map(deque2, [](int x){ return x % 100; });
+    deque2->PrintDeque();
+    getchar();
+    cout << "DEQUE - WHERE" << endl;
+    deque2 = Where(deque1, [](int x){ return x < 0; });
+    deque2->PrintDeque();
+    getchar();
+    int sum = 0;
+    for(int i = 0; i < deque1->GetLength(); i++)
+        sum += deque1->Get(i);
+    int y = Reduce(deque1, [](int x1, int x2){ return x1 + x2; }, 0);
+    cout << "DEQUE - REDUCE" << endl << y << " = " << sum << endl << endl;
+    getchar();
+    cout << "DEQUE - SUBDECK 2 TO 5" << endl;
+    deque2 = deque1->SubDeck(2, 5);
+    deque2->PrintDeque();
+    getchar();
+    cout << "DEQUE - CONCATE" << endl;
+    deque2->Concate(deque1);
+    deque2->PrintDeque();
+    delete array;
+    delete deque1;
+    delete deque2;
 };

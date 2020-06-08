@@ -2,6 +2,7 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 #include <iostream>
+#include "DynamicArraySequence.hpp"
 #include "Exception.hpp"
 
 using namespace std;
@@ -78,7 +79,7 @@ class LinkedList
         Node* GetPointer(int index)
         {
             CheckIndex(index);
-            if(index > length / 2 && index > 3)
+            if(index > length / 2)
                 return FromTail(index);
             else
                 return FromHead(index);
@@ -93,7 +94,7 @@ class LinkedList
         Node* FromTail(int index)
         {
             Node* tmp = tail;
-            for(int i = length; i > index; i--)
+            for(int i = length; i > index + 1; i--)
                 tmp = tmp->prev;
             return tmp;
         };
@@ -103,7 +104,7 @@ class LinkedList
         };
         void SwapElements(int index1, int index2)
         {
-            DataType tmp = GetPointer(index1)->data;
+            DataType tmp = Get(index1);
             Set(index1, Get(index2));
             Set(index2, tmp);
         };
@@ -124,16 +125,15 @@ class LinkedList
         };
         LinkedList(const LinkedList<DataType>& list)
         {
-            head = 0;
-            tail = 0;
+            head = tail = 0;
             length = 0;
-            Node* tmp = new Node;
-            tmp->next = list.head;
-            for(int i = 0; i < list.length; i++)
+            Node* tmp = list.head;
+            while(tmp != 0)
             {
-                tmp = tmp->next;
                 PushBack(tmp->data);
+                tmp = tmp->next;
             };
+            CheckEmpty();
         };
         LinkedList(DataType* data, int count)
         {
@@ -196,24 +196,21 @@ class LinkedList
         };
         DataType Get(int index)
         {
-            Node* tmp = head;
-            for(int i = 0; i < index; i++)
-                tmp = tmp->next;
-            return tmp->data;
+            return GetPointer(index)->data;
         };
         DataType Back()
         {
             CheckIndex(length - 1);
             return tail->data;
         };
-        void Set(int index, DataType data)
+        void Set(int index, DataType new_data)
         {
             CheckIndex(index);
-            GetPointer(index)->data = data;
+            GetPointer(index)->data = new_data;
         };
-        void Set(int index, DataType* data)
+        void Set(int index, DataType* new_data)
         {
-            Set(index, *data);
+            Set(index, *new_data);
         };
         int GetLength()
         {
@@ -303,45 +300,43 @@ class LinkedList
             CheckIndex(from, to);
             CheckNegative(to - from);
             LinkedList<DataType>* result = new LinkedList<DataType>();
-            result->head = GetPointer(from);
-            result->tail = GetPointer(to + 1);
-            result->head->prev = 0;
-            result->tail->next = 0;
-            result->length = to - from + 1;
+            Node* tmp = GetPointer(from);
+            for(int i = 0; i < to - from + 1; i++)
+            {
+                result->PushBack(tmp->data);
+                tmp = tmp->next;
+            };
             result->CheckEmpty();
             return result;
         };
-        LinkedList<DataType>* Concate(const LinkedList<DataType>& list1, const LinkedList<DataType>& list2)
+        void PrintList()
         {
-            LinkedList<DataType>* result = new LinkedList<DataType>(list1);
-            result->tail->next = list2.head;
-            result->tail->next->prev = result->tail;
-            //result->tail = list2.tail;
-            result->length += list2.length;
-            result->CheckEmpty();
+            Node* tmp = head;
+            while(tmp != 0)
+            {
+                cout << tmp->data << endl;
+                tmp = tmp->next;
+            };
+        };
+        void Concate(const LinkedList<DataType>* other)
+        {
+            Node* tmp = other->head;
+            for(int i = 0; i < other->length; i++)
+            {
+                PushBack(tmp->data);
+                tmp = tmp->next;
+            };
+            CheckEmpty();
+        };
+        LinkedList<DataType>* GetConcated(const LinkedList<DataType>* other)
+        {
+            LinkedList<DataType>* result = new LinkedList<DataType>(*this);
+            result->Concate(other);
             return result;
-        };
-        LinkedList<DataType>* ConcateFrom(const LinkedList<DataType>& list2)
-        {
-            return Concate(*this, list2);
-        };
-        void Sort()
-        {
-            CheckLength();
-            for(int i = 0; i < length; i++)
-                for(int j = 0; j < length - 1; j++)
-                    if(Get(j) > Get(j + 1))
-                        SwapElements(j, j + 1);
         };
         DataType& operator[](const int index)
         {
-            return *GetPointer(index);
-        };
-        LinkedList<DataType>* GetSorted()
-        {
-            LinkedList<DataType>* result = new LinkedList<DataType>(*this);
-            result->Sort();
-            return result;
+            return *GetPointer(index)->data;
         };
         LinkedList<DataType>& operator+=(const DataType& data)
         {
@@ -363,7 +358,7 @@ class LinkedList
         };
         bool operator>(const LinkedList<DataType>& list)
         {
-            return (length < list.length);
+            return (length > list.length);
         };
         bool operator==(const LinkedList<DataType>& list)
         {

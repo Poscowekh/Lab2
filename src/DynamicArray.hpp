@@ -11,38 +11,38 @@ template <class DataType>
 class DynamicArray
 {
     private:
-        int size;
+        int length;
         int element_size;
         bool empty;
         DataType* data;
-        void Allocate(int new_size)
+        void Allocate(int new_length)
         {
             data = 0;
-            size = new_size;
-            data = (DataType*)malloc(element_size * size);
+            length = new_length;
+            data = (DataType*)malloc(element_size * length);
         };
-        void Reallocate(int new_size)
+        void Reallocate(int new_length)
         {
-            size = new_size;
-            DataType* tmp = NewDataPointer(size);
-            memcpy(tmp, data, element_size * size);
+            length = new_length;
+            DataType* tmp = NewDataPointer(length);
+            memcpy(tmp, data, element_size * length);
             data = tmp;
         };
-        DataType* NewDataPointer(int new_size)
+        DataType* NewDataPointer(int new_length)
         {
-            DataType* tmp = (DataType*)malloc(element_size * new_size);
+            DataType* tmp = (DataType*)malloc(element_size * new_length);
             return tmp;
         };
         void CheckEmpty()
         {
-            if(size > 0)
+            if(length > 0)
                 empty = false;
             else
                 empty = true;
         };
         void CheckIndex(int index)
         {
-            if(index < 0 || index + 1 > size)
+            if(index < 0 || index + 1 > length)
             {
                 try{
                     throw 0;
@@ -54,7 +54,7 @@ class DynamicArray
         };
         void CheckIndex(int index1, int index2)
         {
-            if(index1 < 0 || index1 + 1 > size || index2 < 0 || index2 + 1 > size)
+            if(index1 < 0 || index1 + 1 > length || index2 < 0 || index2 + 1 > length)
             {
                 try{
                     throw 0;
@@ -64,9 +64,9 @@ class DynamicArray
                 };
             };
         };
-        void CheckNegative(int some)
+        void CheckNegative(int value)
         {
-            if(some < 0)
+            if(value < 0)
             {
                 try{
                     throw 0;
@@ -102,10 +102,10 @@ class DynamicArray
             Allocate(0);
             empty = true;
         };
-        DynamicArray(int new_size)
+        DynamicArray(int new_length)
         {
             element_size = sizeof(DataType);
-            Allocate(new_size);
+            Allocate(new_length);
             empty = true;
         };
         DynamicArray(DataType* new_data, int count)
@@ -113,19 +113,19 @@ class DynamicArray
             CheckNegative(count);
             element_size = sizeof(DataType);
             Allocate(count);
-            memcpy(data, new_data, element_size * size);
+            memcpy(data, new_data, element_size * length);
             CheckEmpty();
         };
         DynamicArray(const DynamicArray<DataType>& array)
         {
             element_size = array.element_size;
-            Allocate(array.size);
-            memcpy(data, array.data, element_size * size);
+            Allocate(array.length);
+            memcpy(data, array.data, element_size * length);
             CheckEmpty();
         };
-        int GetSize()
+        int GetLength()
         {
-            return size;
+            return length;
         };
         int GetElementSize()
         {
@@ -133,7 +133,7 @@ class DynamicArray
         };
         DataType Front()
         {
-            CheckNegative(size - 1);
+            CheckNegative(length - 1);
             CheckPointer(data);
             return *data;
         };
@@ -147,13 +147,13 @@ class DynamicArray
         };
         DataType Back()
         {
-            CheckNegative(size - 1);
-            return GetPointer(size - 1);
+            CheckNegative(length - 1);
+            return *GetPointer(length - 1);
         };
         void CopyToArray(DataType* new_data, int from, int count)
         {
             CheckIndex(from, count);
-            if(from + count - 1 > size)
+            if(from + count - 1 > length)
             {
                 try{
                     throw 0;
@@ -162,9 +162,9 @@ class DynamicArray
                     delete a;
                 };
             };
-            int old_size = size;
-            Reallocate(size + count);
-            memcpy(data + old_size, new_data + from, element_size * count);
+            int old_length = length;
+            Reallocate(length + count);
+            memcpy(data + old_length, new_data + from, element_size * count);
             CheckEmpty();
         };  
         void Set(int index, DataType* new_data)
@@ -179,15 +179,15 @@ class DynamicArray
         };
         void PopBack()
         {
-            CheckNegative(size - 1);
-            Reallocate(size - 1);
-            if(size == 0)
+            CheckNegative(length - 1);
+            Reallocate(length - 1);
+            if(length == 0)
                 empty = true;
         };
         void PushBack(DataType* new_data)
         {
-            Reallocate(size + 1);
-            memcpy(data + size - 1, new_data, element_size);
+            Reallocate(length + 1);
+            memcpy(data + length - 1, new_data, element_size);
             empty = false;
         };
         void PushBack(DataType new_data)
@@ -196,33 +196,31 @@ class DynamicArray
         };
         void PopFront()
         {
-            CheckNegative(size - 1);
-            DataType* tmp = NewDataPointer(size - 1);
-            memcpy(tmp, data + 1, element_size * (size - 1));
+            CheckNegative(length - 1);
+            DataType* tmp = NewDataPointer(length - 1);
+            memcpy(tmp, data + 1, element_size * (length - 1));
             data = tmp;
-            size--;
-            if(size == 0)
-                empty = true;
+            length--;
+            CheckEmpty();
         };
         void PushFront(DataType* new_data)
         {
-            DataType* tmp = NewDataPointer(size + 1);
+            DataType* tmp = NewDataPointer(length + 1);
             memcpy(tmp, new_data, element_size);
-            memcpy(tmp + 1, data, element_size * size);
+            memcpy(tmp + 1, data, element_size * length);
             data = tmp;
-            size++;
-            empty = false;
+            length++;
+            CheckEmpty();
         };
         void PushFront(DataType new_data)
         {
             PushFront(&new_data);
         };
-        void Resize(int new_size)
+        void Resize(int new_length)
         {
-            CheckNegative(new_size - 1);
-            Reallocate(new_size);
-            if(size == 0)
-                empty = true;
+            CheckNegative(new_length - 1);
+            Reallocate(new_length);
+            CheckEmpty();
         };
         void RemoveAt(int index)
         {
@@ -231,19 +229,18 @@ class DynamicArray
                 PopFront();
             else
             {
-                if(index == size - 1)
+                if(index == length - 1)
                     PopBack();
                 else
                 {
-                    DataType* tmp = NewDataPointer(size - 1);
+                    DataType* tmp = NewDataPointer(length - 1);
                     memcpy(tmp, data, index * element_size);
-                    memcpy(tmp, data + index + 1, element_size * (size - index - 1));
+                    memcpy(tmp, data + index + 1, element_size * (length - index - 1));
                     data = tmp;
-                    size--;
+                    length--;
                 };
             };
-            if(size == 0)
-                empty = true;
+            CheckEmpty();
         };
         void InsertAt(DataType* new_data, int index)
         {
@@ -252,14 +249,14 @@ class DynamicArray
                 PushFront(new_data);
             else
             {
-                DataType* tmp = NewDataPointer(size + 1);
+                DataType* tmp = NewDataPointer(length + 1);
                 memcpy(tmp, data, index * element_size);
                 memcpy(tmp + index, new_data, element_size);
-                memcpy(tmp + index + 1, data + index, element_size * (size - index - 1));
+                memcpy(tmp + index + 1, data + index, element_size * (length - index - 1));
                 data = tmp;
-                size++;
+                length++;
             };
-            empty = false;
+            CheckEmpty();
         };
         void InsertAt(DataType new_data, int index)
         {
@@ -267,14 +264,15 @@ class DynamicArray
         };
         void Clear()
         {
-            data = 0;
-            size = 0;
+            free((void*)data);
+            Reallocate(0);
+            length = 0;
             empty = true;
         };
         void Sort()
         {
-            for(int i = 0; i < size; i++)
-                for(int j = 0; j < size - 1; j++)
+            for(int i = 0; i < length; i++)
+                for(int j = 0; j < length - 1; j++)
                     if(Get(j) < Get(j + 1))
                     {
                         DataType tmp = Get(j);
@@ -284,24 +282,24 @@ class DynamicArray
         };
         void ConcateTo(const DynamicArray<DataType>& array)
         {
-            CopyToArray(array.data, 0, array.size);
+            CopyToArray(array.data, 0, array.length);
         };
         void ConcateTo(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
         {
-            CopyToArray(array1.data, 0, array1.size);
-            CopyToArray(array2.data, 0, array2.size);
+            CopyToArray(array1.data, 0, array1.length);
+            CopyToArray(array2.data, 0, array2.length);
         };
         DynamicArray<DataType>* ConcateThisTo(const DynamicArray<DataType>& array)
         {
             DynamicArray<DataType>* result = new DynamicArray<DataType>(this);
-            result->CopyToArray(array.data, 0, array.size - 1);
+            result->CopyToArray(array.data, 0, array.length - 1);
             return result;
         };
         DynamicArray<DataType>* ConcateThisTo(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
         {
             DynamicArray<DataType>* result = new DynamicArray<DataType>(this);
-            result->CopyToArray(array1.data, 0, array1.size - 1);
-            result->CopyToArray(array2.data, 0, array2.size - 1);
+            result->CopyToArray(array1.data, 0, array1.length - 1);
+            result->CopyToArray(array2.data, 0, array2.length - 1);
             return result;
         };
         DataType& operator[](const int index)
@@ -311,7 +309,7 @@ class DynamicArray
         DynamicArray<DataType>* GetSubArray(int from, int to)
         {
             CheckIndex(from, to);
-            if(to - from + 1 > size)
+            if(to - from + 1 > length)
             {
                 try{
                     throw 0;
@@ -351,14 +349,14 @@ class DynamicArray
         };
         bool operator==(const DynamicArray<DataType>& array)
         {
-            if(size == 0 && array.size == 0)
+            if(length == 0 && array.length == 0)
                 return true;
-            if(size != array.size)
+            if(length != array.length)
                 return false;
             DataType* tmp1 = data;
             DataType* tmp2 = array.data;
             int count = 0;
-            while(*tmp1 == *tmp2 && count < size)
+            while(*tmp1 == *tmp2 && count < length)
             {
                 tmp1 = tmp1 + 1;
                 tmp2 = tmp2 + 1;
@@ -371,19 +369,19 @@ class DynamicArray
         };
         bool operator>(const DynamicArray<DataType>& array)
         {
-            return (size > array.size);
+            return (length > array.length);
         };
         bool operator<(const DynamicArray<DataType>& array)
         {
-            return (size < array.size);
+            return (length < array.length);
         };
         bool operator>=(const DynamicArray<DataType>& array)
         {
-            return (size >= array.size);
+            return (length >= array.length);
         };
         bool operator<=(const DynamicArray<DataType>& array)
         {
-            return (size <= array.size);
+            return (length <= array.length);
         };
         bool Empty()
         {
