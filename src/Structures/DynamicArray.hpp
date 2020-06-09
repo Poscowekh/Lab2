@@ -3,7 +3,7 @@
 #define DYNAMICARRAY_H
 #include <mem.h>
 #include <stdlib.h>
-#include "Exception.hpp"
+#include "../Utility/Exception.hpp"
 
 using namespace std;
 
@@ -152,8 +152,8 @@ class DynamicArray
         };
         void CopyToArray(DataType* new_data, int from, int count)
         {
-            CheckIndex(from, count);
-            if(from + count - 1 > length)
+            //CheckIndex(from, count);
+            /*if(from + count - 1 > length)
             {
                 try{
                     throw 0;
@@ -161,7 +161,7 @@ class DynamicArray
                     Exception* a = new Exception(code);
                     delete a;
                 };
-            };
+            };*/
             int old_length = length;
             Reallocate(length + count);
             memcpy(data + old_length, new_data + from, element_size * count);
@@ -234,8 +234,8 @@ class DynamicArray
                 else
                 {
                     DataType* tmp = NewDataPointer(length - 1);
-                    memcpy(tmp, data, index * element_size);
-                    memcpy(tmp, data + index + 1, element_size * (length - index - 1));
+                    memcpy(tmp, data, element_size * index);
+                    memcpy(tmp + index, data + index + 1, element_size * (length - index));
                     data = tmp;
                     length--;
                 };
@@ -252,7 +252,7 @@ class DynamicArray
                 DataType* tmp = NewDataPointer(length + 1);
                 memcpy(tmp, data, index * element_size);
                 memcpy(tmp + index, new_data, element_size);
-                memcpy(tmp + index + 1, data + index, element_size * (length - index - 1));
+                memcpy(tmp + index + 1, data + index, element_size * (length - index));
                 data = tmp;
                 length++;
             };
@@ -280,26 +280,26 @@ class DynamicArray
                         Set(j + 1, tmp);
                     };
         };
-        void ConcateTo(const DynamicArray<DataType>& array)
+        void Concate(const DynamicArray<DataType>& array)
         {
             CopyToArray(array.data, 0, array.length);
         };
-        void ConcateTo(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
+        void Concate(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
         {
             CopyToArray(array1.data, 0, array1.length);
             CopyToArray(array2.data, 0, array2.length);
         };
-        DynamicArray<DataType>* ConcateThisTo(const DynamicArray<DataType>& array)
+        DynamicArray<DataType>* GetConcated(const DynamicArray<DataType>& array)
         {
-            DynamicArray<DataType>* result = new DynamicArray<DataType>(this);
-            result->CopyToArray(array.data, 0, array.length - 1);
+            DynamicArray<DataType>* result = new DynamicArray<DataType>(*this);
+            result->Concate(array);
             return result;
         };
-        DynamicArray<DataType>* ConcateThisTo(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
+        DynamicArray<DataType>* GetConcated(const DynamicArray<DataType>& array1, const DynamicArray<DataType>& array2)
         {
             DynamicArray<DataType>* result = new DynamicArray<DataType>(this);
-            result->CopyToArray(array1.data, 0, array1.length - 1);
-            result->CopyToArray(array2.data, 0, array2.length - 1);
+            result->Concate(array1);
+            result->Concate(array2);
             return result;
         };
         DataType& operator[](const int index)
@@ -355,13 +355,14 @@ class DynamicArray
                 return false;
             DataType* tmp1 = data;
             DataType* tmp2 = array.data;
-            int count = 0;
-            while(*tmp1 == *tmp2 && count < length)
+            for(int i = 0; i < length; i++)
             {
-                tmp1 = tmp1 + 1;
-                tmp2 = tmp2 + 1;
+                tmp1 = tmp1 + i;
+                tmp2 = tmp2 + i;
+                if(tmp1 != tmp2)
+                    return false;
             };
-            return (*tmp1 == *tmp2);
+            return true;
         };
         bool operator!=(const DynamicArray<DataType>& array)
         {

@@ -1,5 +1,5 @@
-#ifndef DATATYPES_H
 #pragma once
+#ifndef DATATYPES_H
 #define DATATYPES_H
 #include <iostream>
 #include <utility>

@@ -3,7 +3,7 @@
 #define LINKEDLIST_H
 #include <iostream>
 #include "DynamicArraySequence.hpp"
-#include "Exception.hpp"
+#include "../Utility/Exception.hpp"
 
 using namespace std;
 
@@ -258,7 +258,7 @@ class LinkedList
         {
             PopBack(length);
         };
-        void InsertAt(int index, DataType data)
+        void InsertAt(DataType data, int index)
         {
             CheckIndex(index);
             if(index > 0)

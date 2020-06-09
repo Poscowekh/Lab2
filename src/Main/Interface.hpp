@@ -3,9 +3,16 @@
 #include <stdio.h>
 #include "Example.hpp"
 #include "Manual.hpp"
-#include "Tests.hpp"
+#include "../Tests/Tests.hpp"
 
 using namespace std;
+
+void ClearConsole()
+{
+    getchar();
+    for(int i = 0; i < 40; i++)
+        cout << endl;
+};
 
 void StartMenu()
 {
@@ -30,7 +37,7 @@ void StartMenu()
             StartMenu();
         break;
         case 2:
-            test_main();
+            Tests();
             getchar();
             StartMenu();
         break;
