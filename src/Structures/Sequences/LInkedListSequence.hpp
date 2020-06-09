@@ -1,12 +1,12 @@
 #pragma once
 #ifndef LINKEDLISTSEQUENCE_H
 #define LINKEDLISTSEQUENCE_H
-#include "LinkedList.hpp"
+#include "../Basic/LinkedList.hpp"
+#include "../Basic/DynamicArray.hpp"
 #include "Sequence.hpp"
-#include "DynamicArraySequence.hpp"
 
 template <class DataType>
-class LinkedListSequence
+class LinkedListSequence : Sequence<DataType>
 {
     private:
         LinkedList<DataType>* list;
@@ -40,8 +40,8 @@ class LinkedListSequence
         };
         LinkedListSequence(const LinkedListSequence<DataType>& from)
         {
-            list = new LinkedList<DataType>(*(from.list));
-            length = list->GetLength();
+            list = new LinkedList<DataType>(*from.list);
+            length = from.length;
             CheckEmpty();
         };
         LinkedListSequence(DynamicArray<DataType>* from)
@@ -82,6 +82,12 @@ class LinkedListSequence
             result->CheckEmpty();
             return result;
         };
+        void Clear()
+        {
+            list->Clear();
+            length = 0;
+            empty = true;
+        };
         void Append(DataType data)
         {
             list->PushBack(data);
@@ -102,12 +108,13 @@ class LinkedListSequence
         {
             Prepend(*data);
         };
-        void InsertAt(const int index, DataType data)
+        void InsertAt(DataType data, const int index)
         {
             list->InsertAt(data, index);
             length++;
+            CheckEmpty();
         };
-        void InsertAt(const int index, DataType* data)
+        void InsertAt(DataType* data, const int index)
         {
             InsertAt(*data, index);
         };
@@ -115,14 +122,7 @@ class LinkedListSequence
         {
             list->RemoveAt(index);
             length--;
-            if(length < 1)
-                empty = true;
-        };
-        void RemoveAll()
-        {
-            list->Clear();
-            length = 0;
-            empty = true;
+            CheckEmpty();
         };
         void PopBack()
         {
@@ -180,10 +180,7 @@ class LinkedListSequence
         void CopyTo(LinkedListSequence<DataType>* to, int from_index, int to_index)
         {
             to->list = list->GetSublist(from_index, to_index);
-            if(to->length > 0)
-                to->empty = false;
-            else
-                to->empty = true;
+            to->CheckEmpty();
         };
         DataType& operator[](const int index)
         {

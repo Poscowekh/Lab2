@@ -1,8 +1,7 @@
 #pragma once
 #include <random>
-#include "DataTypes.hpp"
-#include "../Structures/DynamicArray.hpp"
-#include "Function.hpp"
+#include "../DataTypes/Complex.hpp"
+#include "../../Structures/Basic/DynamicArray.hpp"
 
 using namespace std;
 

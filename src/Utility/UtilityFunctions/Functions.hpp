@@ -1,9 +1,9 @@
 #pragma once
-#ifndef FUNCTION_H
-#define FUNCTION_H
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 #include <string>
 
-using namespace std;
+using namespace std;            //Template Functions For Containers
 
 template<typename Container, typename Function>
 Container* Map(Container* container, Function function)
@@ -48,38 +48,4 @@ Container* Sort(Container* container)
     return result;
 };
 
-template<class ReturnType, class ArgumentType>
-class TestFunctionWithArgs
-{
-    public:
-        string function_name;
-        ReturnType(*const function(ArgumentType))();
-        ReturnType operator()()
-        {
-            return function();
-        };
-        TestFunctionWithArgs(string func_name, ReturnType(*const func(ArgumentType))())
-        {
-            function_name = func_name;
-            function = func;
-        };
-};
-
-template<class ReturnType>
-class TestFunction
-{
-    public:
-        string function_name;
-        ReturnType(*function)() = 0;
-        ReturnType operator()()
-        {
-            return function();
-        };
-        TestFunction(string func_name, ReturnType(*const func)())
-        {
-            function_name = func_name;
-            function = func;
-        };
-};
-
-#endif // FUNCTION_H
+#endif // FUNCTIONS_H

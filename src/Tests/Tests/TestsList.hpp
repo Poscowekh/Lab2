@@ -1,9 +1,9 @@
 #pragma once
-#include "../Structures/DynamicArray.hpp"
-#include "../Structures/LinkedList.hpp"
-#include "../Utility/RandomGen.hpp"
-#include "../Utility/Function.hpp"
-#include "Check.h"
+#include "../../Structures/Basic/DynamicArray.hpp"
+#include "../../Structures/Basic/LinkedList.hpp"
+#include "../../Utility/Randomization/RandomGen.hpp"
+#include "../Basic/TestFunctions.hpp"
+#include "../Basic/Check.h"
 #include <time.h>
 
 using namespace std;
@@ -139,7 +139,7 @@ Check TestListInsertRemove()
     return NO_ERROR;
 };
 
-Check TestListSublist()
+Check TestSublist()
 {
     int seed = time(NULL);
     srand(seed);
@@ -169,11 +169,11 @@ Check TestListConcate()
     LinkedList<int>* list1 = new LinkedList<int>();
     LinkedList<int>* list2 = new LinkedList<int>();
     LinkedList<int>* list3 = new LinkedList<int>();
-    int r_size1 = 5;//rand() % 1000 + 1;
+    int r_size1 = rand() % 1000 + 1;
     int a = RandomInt(seed);
     seed++;
     srand(seed);
-    int r_size2 = 6;//rand() % 1000 + 1;
+    int r_size2 = rand() % 1000 + 1;
     int b = RandomInt(seed);
     for(int i = 0; i < r_size1; i++)
         list1->PushBack(a);

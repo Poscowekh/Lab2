@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DATATYPES_H
-#define DATATYPES_H
+#ifndef COMPLEX_H
+#define COMPLEX_H
 #include <iostream>
 #include <utility>
 #include <string>
@@ -130,4 +130,4 @@ class Complex
         };
 };
 
-#endif // DATATYPES_H
+#endif // COMPLEX_H

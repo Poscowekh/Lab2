@@ -3,7 +3,7 @@
 #define EXCEPTION_H
 #include <iostream>
 
-using namespace std;
+using namespace std;        //Project Specific
 
 class Exception
 {

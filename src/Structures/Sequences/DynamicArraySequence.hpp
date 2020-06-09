@@ -2,10 +2,10 @@
 #ifndef ARRAYSEQUENCE_H
 #define ARRAYSEQUENCE_H
 #include "Sequence.hpp"
-#include "DynamicArray.hpp"
+#include "../Basic/DynamicArray.hpp"
 
 template <class DataType>
-class DynamicArraySequence
+class DynamicArraySequence : public Sequence<DataType>
 {
     private:
         DynamicArray<DataType>* array;

@@ -1,9 +1,9 @@
 #pragma once
 #include <iostream>
 #include <stdio.h>
-#include "Example.hpp"
+#include "../Examples/Example.hpp"
 #include "Manual.hpp"
-#include "../Tests/Tests.hpp"
+#include "../Tests/Main/TestMain.hpp"
 
 using namespace std;
 

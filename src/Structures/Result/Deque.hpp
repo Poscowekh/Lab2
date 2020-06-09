@@ -1,8 +1,8 @@
 #pragma once
 #ifndef DEQUE_H
 #define DEQUE_H
-#include "LInkedListSequence.hpp"
-#include "DynamicArraySequence.hpp"
+#include "../Sequences/LinkedListSequence.hpp"
+#include "../Sequences/DynamicArraySequence.hpp"
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #define CHECK_H
 #pragma once
 
-int overall_errors = 0;
+int overall_errors = 0;     //Project Specific
 
 typedef enum
 {

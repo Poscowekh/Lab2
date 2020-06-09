@@ -1,6 +1,7 @@
 #pragma once
-#include "../Structures/Deque.hpp"
-#include "../Utility/RandomGen.hpp"
+#include "../Structures/Result/Deque.hpp"
+#include "../Utility/Randomization/RandomGen.hpp"
+#include "../Utility/UtilityFunctions/Functions.hpp"
 #include <time.h>
 
 using namespace std;

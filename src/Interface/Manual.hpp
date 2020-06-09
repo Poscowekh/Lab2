@@ -1,7 +1,7 @@
 #pragma once
 #ifndef MANUAL_H
 #define MANUAL_H
-#include "Example.hpp"
+#include "../Examples/Example.hpp"
 
 using namespace std;
 

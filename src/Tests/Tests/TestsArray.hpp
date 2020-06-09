@@ -1,8 +1,8 @@
 #pragma once
-#include "../Structures/DynamicArray.hpp"
-#include "../Utility/RandomGen.hpp"
-#include "../Utility/Function.hpp"
-#include "Check.h"
+#include "../../Structures/Basic/DynamicArray.hpp"
+#include "../../Utility/Randomization/RandomGen.hpp"
+#include "../Basic/TestFunctions.hpp"
+#include "../Basic/Check.h"
 #include <time.h>
 
 using namespace std;
@@ -107,7 +107,7 @@ Check TestArrayInsertRemove()
 {
     int seed = time(NULL);
     srand(seed);
-    int r_size = rand() % 10 + 1;//% 1000 + 1;
+    int r_size = rand() % 1000 + 1;
     seed++;
     DynamicArray<int>* array = IntArray(seed, r_size);
     DynamicArray<int>* array_copy = new DynamicArray<int>(*array);
@@ -137,7 +137,7 @@ Check TestArrayInsertRemove()
     return NO_ERROR;
 };
 
-Check TestArraySubArray()
+Check TestSubArray()
 {
     int seed = time(NULL);
     srand(seed);
@@ -167,11 +167,11 @@ Check TestArrayConcate()
     DynamicArray<int>* array1 = new DynamicArray<int>();
     DynamicArray<int>* array2 = new DynamicArray<int>();
     DynamicArray<int>* array3 = new DynamicArray<int>();
-    int r_size1 = 5;//rand() % 1000 + 1;
+    int r_size1 = rand() % 1000 + 1;
     int a = RandomInt(seed);
     seed++;
     srand(seed);
-    int r_size2 = 6;//rand() % 1000 + 1;
+    int r_size2 = rand() % 1000 + 1;
     int b = RandomInt(seed);
     for(int i = 0; i < r_size1; i++)
         array1->PushBack(a);

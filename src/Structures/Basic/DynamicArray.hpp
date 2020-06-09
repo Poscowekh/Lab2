@@ -3,7 +3,7 @@
 #define DYNAMICARRAY_H
 #include <mem.h>
 #include <stdlib.h>
-#include "../Utility/Exception.hpp"
+#include "../../Utility/Exceptions/Exception.hpp"
 
 using namespace std;
 

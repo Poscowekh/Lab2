@@ -1,9 +1,7 @@
 #pragma once
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
-#include <iostream>
-#include "DynamicArraySequence.hpp"
-#include "../Utility/Exception.hpp"
+#include "../../Utility/Exceptions/Exception.hpp"
 
 using namespace std;
 
@@ -258,18 +256,17 @@ class LinkedList
         {
             PopBack(length);
         };
-        void InsertAt(DataType data, int index)
+        void InsertAt(DataType data, const int index)
         {
             CheckIndex(index);
             if(index > 0)
             {
-                Node* tmp = GetPointer(index);
-                Node* new_node;
+                Node* new_node = new Node;
                 new_node->data = data;
-                new_node->next = tmp;
-                new_node->prev = tmp->prev;
-                new_node->prev->next = new_node;
-                tmp->prev = new_node;
+                new_node->next = GetPointer(index);
+                new_node->prev = GetPointer(index)->prev;
+                GetPointer(index)->prev->next = new_node;
+                GetPointer(index)->prev = new_node;
                 length++;
                 empty = false;
             }
@@ -292,6 +289,7 @@ class LinkedList
                     tmp->prev->next = tmp->next;
                     delete tmp;
                     length--;
+                    CheckEmpty();
                 };
             };
         };
@@ -336,7 +334,7 @@ class LinkedList
         };
         DataType& operator[](const int index)
         {
-            return *GetPointer(index)->data;
+            return GetPointer(index)->data;
         };
         LinkedList<DataType>& operator+=(const DataType& data)
         {
@@ -394,6 +392,5 @@ class LinkedList
         };
         ~LinkedList(){};
 };
-
 
 #endif // LINKEDLIST_H
