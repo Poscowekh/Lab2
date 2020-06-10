@@ -26,7 +26,7 @@ class LinkedList
             else
                 empty = true;
         };
-        void CheckIndex(int index)
+        void CheckIndex(const int index)
         {
             if(index < 0 || index + 1 > length)
             {
@@ -38,7 +38,7 @@ class LinkedList
                 };
             };
         };
-        void CheckIndex(int index1, int index2)
+        void CheckIndex(const int index1, const int index2)
         {
             if(index1 < 0 || index1 + 1 > length || index2 < 0 || index2 + 1 > length)
             {
@@ -50,7 +50,7 @@ class LinkedList
                 };
             };
         };
-        void CheckNegative(int some)
+        void CheckNegative(const int some)
         {
             if(some < 0)
             {
@@ -74,7 +74,7 @@ class LinkedList
                 };
             };
         };
-        Node* GetPointer(int index)
+        Node* GetPointer(const int index)
         {
             CheckIndex(index);
             if(index > length / 2)
@@ -264,16 +264,16 @@ class LinkedList
                 Node* new_node = new Node;
                 new_node->data = data;
                 new_node->next = GetPointer(index);
-                new_node->prev = GetPointer(index)->prev;
-                GetPointer(index)->prev->next = new_node;
-                GetPointer(index)->prev = new_node;
+                new_node->prev = new_node->next->prev;
+                new_node->next->prev->next = new_node;
+                new_node->next->prev = new_node;
                 length++;
                 empty = false;
             }
             else
                 PushFront(data);
         };
-        void RemoveAt(int index)
+        void RemoveAt(const int index)
         {
             CheckIndex(index);
             if(index == 0)

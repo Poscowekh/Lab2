@@ -107,7 +107,7 @@ Check TestSequenceInsertRemove()
 {
     int seed = time(NULL);
     srand(seed);
-    int r_size = 5;//rand() % 5 + 1;//% 1000 + 1;
+    int r_size = rand() % 1000 + 1;
     seed++;
     DynamicArray<int>* array = IntArray(seed, r_size);
     LinkedListSequence<int>* sequence = new LinkedListSequence<int>(array);
@@ -115,7 +115,6 @@ Check TestSequenceInsertRemove()
     srand(seed);
     int at = rand() % r_size;
     int r_int = RandomInt(seed);
-    seed++;
     sequence->InsertAt(r_int, at);
     if(sequence->GetLength() - 1 != sequence_copy->GetLength())
         return ERROR;
@@ -134,6 +133,7 @@ Check TestSequenceInsertRemove()
             return ERROR;
     delete sequence;
     delete sequence_copy;
+    delete array;
     return NO_ERROR;
 };
 
@@ -142,18 +142,16 @@ Check TestSubsequence()
     int seed = time(NULL);
     srand(seed);
     seed++;
-    int r_size = rand() % 1000 + 1;
-    LinkedListSequence<int>* sequence = new LinkedListSequence<int>();
-    int a = RandomInt(seed);
-    for(int i = 0; i < r_size; i++)
-        sequence->Append(a);
+    int r_size = rand() % 1000 + 4;
+    DynamicArray<int>* array = IntArray(seed, r_size);
+    LinkedListSequence<int>* sequence = new LinkedListSequence<int>(array->DataPointer(), r_size);
     int from = rand() % (sequence->GetLength() / 4);
     int to = rand() % (sequence->GetLength() / 4) + sequence->GetLength() / 2;
     LinkedListSequence<int>* subsequence = sequence->GetSubsequence(from, to);
     if(subsequence->GetLength() != to - from + 1)
         return ERROR;
     for(int i = 0; i < subsequence->GetLength(); i++)
-        if(subsequence->Get(i) != a)
+        if(subsequence->Get(i) != sequence->Get(from + i))
             return ERROR;
     delete sequence;
     delete subsequence;

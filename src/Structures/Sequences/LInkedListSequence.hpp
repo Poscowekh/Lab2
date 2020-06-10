@@ -41,7 +41,7 @@ class LinkedListSequence : Sequence<DataType>
         LinkedListSequence(const LinkedListSequence<DataType>& from)
         {
             list = new LinkedList<DataType>(*from.list);
-            length = from.length;
+            length = list->GetLength();
             CheckEmpty();
         };
         LinkedListSequence(DynamicArray<DataType>* from)

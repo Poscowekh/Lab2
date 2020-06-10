@@ -144,18 +144,16 @@ Check TestSublist()
     int seed = time(NULL);
     srand(seed);
     seed++;
-    int r_size = rand() % 1000 + 1;
-    LinkedList<int>* list = new LinkedList<int>();
-    int a = RandomInt(seed);
-    for(int i = 0; i < r_size; i++)
-        list->PushBack(a);
+    int r_size = rand() % 1000 + 4;
+    DynamicArray<int>* array = IntArray(seed, r_size);
+    LinkedList<int>* list = new LinkedList<int>(array->DataPointer(), r_size);
     int from = rand() % (list->GetLength() / 4);
     int to = rand() % (list->GetLength() / 4) + list->GetLength() / 2;
     LinkedList<int>* sublist = list->GetSublist(from, to);
     if(sublist->GetLength() != to - from + 1)
         return ERROR;
     for(int i = 0; i < sublist->GetLength(); i++)
-        if(sublist->Get(i) != a)
+        if(sublist->Get(i) != list->Get(from + i))
             return ERROR;
     delete list;
     delete sublist;

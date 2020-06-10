@@ -52,7 +52,6 @@ void Example()
     int y = Reduce(deque1, [](int x1, int x2){ return x1 + x2; }, 0);
     cout << "DEQUE - REDUCE" << endl << y << " = " << sum << endl;
     cout << "DEQUE - SubDeque 2 TO 5" << endl;
-    deque1->PrintDeque();
     deque2 = deque1->SubDeque(2, 5);
     deque2->PrintDeque();
     cout << "DEQUE - CONCATE" << endl;

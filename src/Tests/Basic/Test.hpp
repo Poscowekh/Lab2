@@ -47,7 +47,7 @@ class Test
             {
                 tmp = functions + i;
                 check = tmp->function();
-                cout << "   " << "test " << i + 1 << ": " << tmp->function_name << " - ";
+                cout << "   " << "Test " << i + 1 << ": " << tmp->function_name << " - ";
                 if(check == ERROR)
                 {
                     errors++;
@@ -57,7 +57,11 @@ class Test
                 else
                     cout << "no errors" << endl;
             };
-            cout << "Errors found: " << errors << endl << "Test Finished." << endl << endl;
+            cout << "Test finished";
+            if(errors > 0)
+                cout << "with " << errors << " errors." << endl;
+            else
+                cout << " succesfully." << endl;
         };
 };
 

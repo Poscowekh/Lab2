@@ -19,6 +19,7 @@ void TestArray()
     array_test->AddTest("SubArray", TestSubArray);
     array_test->AddTest("Concate Arrays", TestArrayConcate);
     array_test->RunTests();
+    cout << endl;
 };
 
 //List
@@ -32,6 +33,7 @@ void TestList()
     list_test->AddTest("SubList", TestSublist);
     list_test->AddTest("Concate Lists", TestListConcate);
     list_test->RunTests();
+    cout << endl;
 };
 
 //SEQUENCE
@@ -40,41 +42,38 @@ void TestSequence() //Tests for LinkedListSequence only
     Test* sequence_test = new Test("sequence");
     sequence_test->AddTest("Create Sequence", TestSequenceCreate);
     sequence_test->AddTest("Set/Get Sequence", TestSequenceSetGet);
-    sequence_test->AddTest("Push/Pop Sequence", TestSequencePushPop);   //Append/Prepend
+    sequence_test->AddTest("Push/Pop Sequence", TestSequencePushPop);   //Append&Prepend
     sequence_test->AddTest("InsertAt/RemoveAt Sequence", TestSequenceInsertRemove);
     sequence_test->AddTest("SubSequence", TestSubsequence);
     sequence_test->AddTest("Concate Sequences", TestSequenceConcate);
     sequence_test->RunTests();
+    cout << endl;
 };
 
 //DEQUE
-/*void TestDeque()
+void TestDeque()
 {
     Test* deque_test = new Test("deque");
     deque_test->AddTest("Create Deque", TestDequeCreate);
     deque_test->AddTest("Set/Get Deque", TestDequeSetGet);
     deque_test->AddTest("Push/Pop Deque", TestDequePushPop);
     deque_test->AddTest("InsertAt/RemoveAt Deque", TestDequeInsertRemove);
-    deque_test->AddTest("SubDeque", TestListSubdeque);
+    deque_test->AddTest("SubDeque", TestSubdeque);
     deque_test->AddTest("Concate Deques", TestDequeConcate);
     deque_test->AddTest("Map Deque", TestDequeMap);
     deque_test->AddTest("Where Deque", TestDequeWhere);
     deque_test->AddTest("Reduce Deque", TestDequeReduce);
     deque_test->AddTest("Sort Deque", TestDequeSort);
     deque_test->RunTests();
-};*/
+};
 
 void Tests()
 {
     cout << endl << "RUNNING TESTS" << endl;
-    //TestArray();
-    //cout << endl;
-    //TestList();
-    //cout << endl;
+    TestArray();
+    TestList();
     TestSequence();
-    //cout << endl;
-    //
-    //cout << endl;
+    TestDeque();
     cout << "All tests finished";
     if(overall_errors > 0)
         cout << ", found " << overall_errors << " errors." << endl;

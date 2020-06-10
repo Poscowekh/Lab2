@@ -27,7 +27,7 @@ class Deque
             empty = true;
             data = new LinkedListSequence<DataType>();
         };
-        Deque(const DataType* new_data, const int count)
+        Deque(DataType* new_data, const int count)
         {
             data = new LinkedListSequence<DataType>(new_data, count);
             length = count;
@@ -35,8 +35,8 @@ class Deque
         };
         Deque(const Deque<DataType>& deque)
         {
-            data = new LinkedListSequence<DataType>(*(deque.data));
-            length = deque.length;
+            data = new LinkedListSequence<DataType>(*deque.data);
+            length = data->GetLength();
             CheckEmpty();
         };
         Deque(DynamicArray<DataType>* array)
@@ -52,6 +52,14 @@ class Deque
         bool Empty()
         {
             return empty;
+        };
+        DataType First()
+        {
+            return data->GetFirst();
+        };
+        DataType Last()
+        {
+            return data->GetLast();
         };
         DataType Get(int index)
         {
@@ -95,7 +103,7 @@ class Deque
         };
         void Clear()
         {
-            data->RemoveAll();
+            data->Clear();
             length = 0;
             empty = true;
         };
@@ -114,12 +122,16 @@ class Deque
         void RemoveAt(const int index)
         {
             data->RemoveAt(index);
+            length--;
+            CheckEmpty();
         };
-        void InsertAt(const int index, DataType new_data)
+        void InsertAt(DataType new_data, const int index)
         {
-            data->InsertAt(index, new_data);
+            data->InsertAt(new_data, index);
+            length++;
+            empty = false;
         };
-        Deque<DataType>* SubDeck(int from, int to)
+        Deque<DataType>* SubDeque(int from, int to)
         {
             Deque<DataType>* result = new Deque<DataType>();
             result->data = data->GetSubsequence(from, to);
